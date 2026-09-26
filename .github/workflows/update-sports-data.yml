@@ -1,0 +1,173 @@
+name: Update sports data
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, 'Update sports data')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Fetch ESPN data and build snapshot
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          const configs = [
+            { league:'MLB', sport:'baseball', key:'mlb', icon:'⚾', teams:[['BOS','Boston Red Sox'],['SF','San Francisco Giants']] },
+            { league:'NFL', sport:'football', key:'nfl', icon:'🏈', teams:[['SF','San Francisco 49ers']] },
+            { league:'NHL', sport:'hockey', key:'nhl', icon:'🏒', teams:[['SJ','San Jose Sharks']] },
+            { league:'MLS', sport:'soccer', key:'usa.1', icon:'⚽', teams:[['SJ','San Jose Earthquakes']] }
+          ];
+
+          async function get(url) {
+            const r = await fetch(url, { headers: { 'User-Agent': 'my-sports-dashboard/1.0' } });
+            if (!r.ok) throw new Error(`${r.status} ${url}`);
+            return r.json();
+          }
+
+          function walkTeams(o, out=[]) {
+            if (!o || typeof o !== 'object') return out;
+            if (Array.isArray(o)) { for (const x of o) walkTeams(x, out); return out; }
+            if (o.team?.abbreviation) out.push(o.team);
+            if (Array.isArray(o.teams)) for (const x of o.teams) out.push(x.team || x);
+            for (const v of Object.values(o)) if (v && typeof v === 'object' && v !== o) walkTeams(v, out);
+            return out;
+          }
+
+          function findStanding(data, id) {
+            let found;
+            const walk = o => {
+              if (!o || typeof o !== 'object' || found) return;
+              if (Array.isArray(o)) { for (const x of o) walk(x); return; }
+              if (o.team?.id == id) { found = o; return; }
+              for (const v of Object.values(o)) if (v && typeof v === 'object') walk(v);
+            };
+            walk(data);
+            return found;
+          }
+
+          function statsMap(item) {
+            const m = {};
+            for (const s of item?.stats || []) m[String(s.name || s.type || '').toLowerCase()] = s.displayValue ?? s.value;
+            return m;
+          }
+
+          function recordFrom(item) {
+            const stats = statsMap(item);
+            const wins = stats.wins ?? stats.w;
+            const losses = stats.losses ?? stats.l;
+            const ties = stats.ties ?? stats.t;
+            const otl = stats.otlosses ?? stats.otl;
+            if (wins !== undefined && losses !== undefined) {
+              let r = `${wins}-${losses}`;
+              if (ties !== undefined) r += `-${ties}`;
+              else if (otl !== undefined) r += `-${otl}`;
+              return r;
+            }
+            return item?.summary || item?.displayValue || '—';
+          }
+
+          function standingFor(data, id) {
+            const item = findStanding(data, id);
+            if (!item) return {};
+            const s = statsMap(item);
+            return {
+              rank: item.seed ?? item.rank ?? item.team?.rank,
+              wins: s.wins ?? s.w,
+              losses: s.losses ?? s.l,
+              ties: s.ties ?? s.t,
+              otl: s.otlosses ?? s.otl,
+              points: s.points,
+              gb: s.gamesbehind ?? s.gamesBehind ?? s.gb,
+              streak: s.streak
+            };
+          }
+
+          function leadersFrom(data) {
+            const groups = [];
+            const add = (name, obj) => {
+              const arr = obj?.leaders || obj;
+              if (!Array.isArray(arr) || !arr.length) return;
+              const first = arr[0];
+              const athlete = first.athlete || first.player || first;
+              const value = first.displayValue ?? first.value ?? first.stat?.displayValue ?? first.stat?.value;
+              if (value !== undefined) groups.push({
+                name,
+                value,
+                athlete: athlete.displayName || athlete.fullName || athlete.shortName || ''
+              });
+            };
+            if (Array.isArray(data?.leaders)) for (const g of data.leaders) add(g.displayName || g.name || g.shortDisplayName, g);
+            else if (data?.leaders && typeof data.leaders === 'object') for (const [k,v] of Object.entries(data.leaders)) add(k,v);
+            else if (Array.isArray(data?.categories)) for (const g of data.categories) add(g.displayName || g.name, g);
+            return groups.slice(0,5);
+          }
+
+          async function loadTeam(conf, spec, catalog, standings) {
+            const team = catalog.find(t => String(t.abbreviation || '').toUpperCase() === spec[0]);
+            if (!team) throw new Error(`Team not found: ${spec[1]}`);
+            const id = team.id;
+
+            let detail = {};
+            let leaderData = {};
+            try { detail = await get(`https://site.api.espn.com/apis/site/v2/sports/${conf.sport}/${conf.key}/teams/${id}`); } catch {}
+            try { leaderData = await get(`https://site.api.espn.com/apis/site/v2/sports/${conf.sport}/${conf.key}/teams/${id}/leaders`); } catch {}
+
+            const st = standingFor(standings, id);
+            const detailTeam = detail.team || detail;
+            const rec = (st.wins !== undefined && st.losses !== undefined)
+              ? recordFrom({stats: Object.entries(st).filter(([k]) => ['wins','losses','ties','otl'].includes(k)).map(([name,value]) => ({name,value}))})
+              : recordFrom(detailTeam.record?.items?.[0] || detailTeam.record || {});
+
+            return {
+              id,
+              name: team.displayName || spec[1],
+              abbr: team.abbreviation || spec[0],
+              logo: team.logos?.[0]?.href || detailTeam.logos?.[0]?.href || '',
+              record: rec,
+              rank: st.rank,
+              points: st.points,
+              gb: st.gb,
+              streak: st.streak,
+              leaders: leadersFrom(leaderData)
+            };
+          }
+
+          (async () => {
+            const leagues = [];
+            for (const conf of configs) {
+              const teamsData = await get(`https://site.api.espn.com/apis/site/v2/sports/${conf.sport}/${conf.key}/teams`);
+              let standings = {};
+              try { standings = await get(`https://site.api.espn.com/apis/v2/sports/${conf.sport}/${conf.key}/standings`); } catch (e) { console.log('Standings unavailable:', e.message); }
+              const catalog = [...new Map(walkTeams(teamsData).map(t => [t.abbreviation, t])).values()];
+              const teams = [];
+              for (const spec of conf.teams) teams.push(await loadTeam(conf, spec, catalog, standings));
+              leagues.push({ league:conf.league, icon:conf.icon, teams });
+            }
+            fs.writeFileSync('data.json', JSON.stringify({updatedAt:new Date().toISOString(), leagues}, null, 2) + '\n');
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+
+      - name: Publish updated snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          if git diff --cached --quiet; then
+            echo "No sports data changes."
+            exit 0
+          fi
+          git commit -m "Update sports data"
+          git push
