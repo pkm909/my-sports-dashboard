@@ -57,7 +57,7 @@ jobs:
               if (Array.isArray(entries)) {
                 const idx = entries.findIndex(entry => String(entry.team?.id) === String(id));
                 if (idx >= 0) {
-                  found = { entry: entries[idx], rank: idx + 1, group };
+                  found = { entry: entries[idx], rank: idx + 1, group, entries };
                   return;
                 }
               }
@@ -104,6 +104,30 @@ jobs:
             return {
               rank: found.rank ?? item.seed ?? item.rank ?? item.team?.rank,
               group: found.group || item.groupName || item.group,
+              groupStandings: (found.entries || []).map((entry, i) => {
+                const es = statsMap(entry);
+                const ew = es.wins ?? es.w;
+                const el = es.losses ?? es.l;
+                const et = es.ties ?? es.t;
+                const eotl = es.otlosses ?? es.otl;
+                let er = '—';
+                if (ew !== undefined && el !== undefined) {
+                  er = `${ew}-${el}`;
+                  if (et !== undefined) er += `-${et}`;
+                  else if (eotl !== undefined) er += `-${eotl}`;
+                } else if (entry.summary || entry.displayValue) {
+                  er = entry.summary || entry.displayValue;
+                }
+                return {
+                  id: entry.team?.id,
+                  name: entry.team?.displayName || entry.team?.shortDisplayName || '',
+                  abbr: entry.team?.abbreviation || '',
+                  rank: i + 1,
+                  record: er,
+                  points: es.points,
+                  gb: es.gamesbehind ?? es.gamesBehind ?? es.gb
+                };
+              }),
               wins: s.wins ?? s.w,
               losses: s.losses ?? s.l,
               ties: s.ties ?? s.t,
