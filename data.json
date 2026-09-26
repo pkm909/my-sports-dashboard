@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-26T04:10:01.043Z",
+  "updatedAt": "2026-09-26T04:26:28.324Z",
   "leagues": [
     {
       "league": "MLB",
@@ -22,11 +22,11 @@
           "name": "San Francisco Giants",
           "abbr": "SF",
           "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/sf.png",
-          "record": "65-94-0",
+          "record": "65-95-0",
           "rank": 3,
-          "points": "-14.5",
-          "gb": "32",
-          "streak": "L2",
+          "points": "-15.0",
+          "gb": "33",
+          "streak": "L3",
           "leaders": []
         }
       ]
