@@ -39,6 +39,17 @@ function renderLeague(conf, teams) {
           </div>
         </div>
         <div class="record"><span class="big">${esc(t.record || '—')}</span><span class="label">record</span></div>
+        ${t.groupStandings?.length ? `
+          <div class="group-title">${esc(t.group || 'Standings')}</div>
+          <div class="group-standings">
+            ${t.groupStandings.map((s, i) => `<div class="group-row ${String(s.id) === String(t.id) ? 'current' : ''}">
+              <span class="group-rank">${esc(s.rank ?? i + 1)}</span>
+              <span class="group-team">${esc(s.abbr || s.name)}</span>
+              <span class="group-record">${esc(s.record || '—')}</span>
+              <span class="group-extra">${esc(s.points ?? s.gb ?? '')}</span>
+            </div>`).join('')}
+          </div>
+        ` : ''}
         <div class="mini-grid">
           ${t.rank !== undefined ? `<div class="mini"><b>#${esc(t.rank)}</b><span>Standings</span></div>` : ''}
           ${t.points !== undefined ? `<div class="mini"><b>${esc(t.points)}</b><span>Points</span></div>` : ''}
