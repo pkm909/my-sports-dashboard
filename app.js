@@ -35,9 +35,8 @@ function renderLeague(conf, teams) {
         <div class="team-header">
           <div class="team-top">
             <img class="logo" src="${esc(t.logo || '')}" alt="" onerror="this.style.visibility='hidden'">
-            <div class="team-name"><h3>${esc(t.name)}</h3><p>${esc(t.abbr)}</p></div>
+            <div class="team-name"><h3>${esc(t.name)}</h3><p>${esc(t.abbr)}${t.rank !== undefined ? ` · ${esc(ordinal(t.rank))}${t.group ? ` · ${esc(t.group)}` : ''}` : ''}</p></div>
           </div>
-          ${t.rank !== undefined ? `<div class="place"><b>${esc(ordinal(t.rank))}</b><span>${esc(t.group || 'Standings')}</span></div>` : ''}
         </div>
         <div class="record"><span class="big">${esc(t.record || '—')}</span><span class="label">record</span></div>
         <div class="mini-grid">
