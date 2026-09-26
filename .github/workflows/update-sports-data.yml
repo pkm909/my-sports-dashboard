@@ -48,11 +48,28 @@ jobs:
 
           function findStanding(data, id) {
             let found;
-            const walk = o => {
+            const walk = (o, groupName = '') => {
               if (!o || typeof o !== 'object' || found) return;
-              if (Array.isArray(o)) { for (const x of o) walk(x); return; }
-              if (o.team?.id == id) { found = o; return; }
-              for (const v of Object.values(o)) if (v && typeof v === 'object') walk(v);
+              if (Array.isArray(o)) { for (const x of o) walk(x, groupName); return; }
+
+              const group = o.name || o.displayName || groupName;
+              const entries = o.standings?.entries;
+              if (Array.isArray(entries)) {
+                const idx = entries.findIndex(entry => String(entry.team?.id) === String(id));
+                if (idx >= 0) {
+                  found = { entry: entries[idx], rank: idx + 1, group };
+                  return;
+                }
+              }
+
+              if (o.team?.id != null && String(o.team.id) === String(id)) {
+                found = { entry: o, rank: o.rank ?? o.seed, group: groupName };
+                return;
+              }
+
+              for (const v of Object.values(o)) {
+                if (v && typeof v === 'object') walk(v, group);
+              }
             };
             walk(data);
             return found;
@@ -80,11 +97,13 @@ jobs:
           }
 
           function standingFor(data, id) {
-            const item = findStanding(data, id);
-            if (!item) return {};
+            const found = findStanding(data, id);
+            if (!found) return {};
+            const item = found.entry;
             const s = statsMap(item);
             return {
-              rank: item.seed ?? item.rank ?? item.team?.rank,
+              rank: found.rank ?? item.seed ?? item.rank ?? item.team?.rank,
+              group: found.group || item.groupName || item.group,
               wins: s.wins ?? s.w,
               losses: s.losses ?? s.l,
               ties: s.ties ?? s.t,
