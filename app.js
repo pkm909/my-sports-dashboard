@@ -9,6 +9,14 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
 
 const num = x => x === undefined || x === null || x === '' ? '—' : String(x);
 
+function ordinal(n) {
+  const x = Number(n);
+  if (!Number.isFinite(x)) return String(n);
+  const mod100 = x % 100;
+  if (mod100 >= 11 && mod100 <= 13) return x + 'th';
+  return x + ({1:'st',2:'nd',3:'rd'}[x % 10] || 'th');
+}
+
 function prettyCategory(s) {
   return String(s || '')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -24,9 +32,12 @@ function renderLeague(conf, teams) {
     </div>
     <div class="teams">
       ${teams.map(t => `<article class="team ${teams.length === 1 ? 'single' : ''}">
-        <div class="team-top">
-          <img class="logo" src="${esc(t.logo || '')}" alt="" onerror="this.style.visibility='hidden'">
-          <div class="team-name"><h3>${esc(t.name)}</h3><p>${esc(t.abbr)}</p></div>
+        <div class="team-header">
+          <div class="team-top">
+            <img class="logo" src="${esc(t.logo || '')}" alt="" onerror="this.style.visibility='hidden'">
+            <div class="team-name"><h3>${esc(t.name)}</h3><p>${esc(t.abbr)}</p></div>
+          </div>
+          ${t.rank !== undefined ? `<div class="place"><b>${esc(ordinal(t.rank))}</b><span>${esc(t.group || 'Standings')}</span></div>` : ''}
         </div>
         <div class="record"><span class="big">${esc(t.record || '—')}</span><span class="label">record</span></div>
         <div class="mini-grid">
