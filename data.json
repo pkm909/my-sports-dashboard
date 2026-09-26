@@ -1,0 +1,81 @@
+{
+  "updatedAt": "2026-09-26T03:21:10.493Z",
+  "leagues": [
+    {
+      "league": "MLB",
+      "icon": "⚾",
+      "teams": [
+        {
+          "id": "2",
+          "name": "Boston Red Sox",
+          "abbr": "BOS",
+          "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/bos.png",
+          "record": "87-74-0",
+          "points": "6.5",
+          "gb": "10.5",
+          "streak": "W2",
+          "leaders": []
+        },
+        {
+          "id": "26",
+          "name": "San Francisco Giants",
+          "abbr": "SF",
+          "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/sf.png",
+          "record": "65-94-0",
+          "points": "-14.5",
+          "gb": "35.5",
+          "streak": "L2",
+          "leaders": []
+        }
+      ]
+    },
+    {
+      "league": "NFL",
+      "icon": "🏈",
+      "teams": [
+        {
+          "id": "25",
+          "name": "San Francisco 49ers",
+          "abbr": "SF",
+          "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png",
+          "record": "2-0-0",
+          "gb": "-",
+          "streak": "W2",
+          "leaders": []
+        }
+      ]
+    },
+    {
+      "league": "NHL",
+      "icon": "🏒",
+      "teams": [
+        {
+          "id": "18",
+          "name": "San Jose Sharks",
+          "abbr": "SJ",
+          "logo": "https://a.espncdn.com/i/teamlogos/nhl/500/sj.png",
+          "record": "1-1-1",
+          "points": "3",
+          "gb": "5",
+          "streak": "W1",
+          "leaders": []
+        }
+      ]
+    },
+    {
+      "league": "MLS",
+      "icon": "⚽",
+      "teams": [
+        {
+          "id": "191",
+          "name": "San Jose Earthquakes",
+          "abbr": "SJ",
+          "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/191.png",
+          "record": "12-8-6",
+          "points": "42",
+          "leaders": []
+        }
+      ]
+    }
+  ]
+}
