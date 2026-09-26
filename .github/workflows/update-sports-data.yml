@@ -25,10 +25,10 @@ jobs:
           const fs = require('fs');
 
           const configs = [
-            { league:'MLB', sport:'baseball', key:'mlb', icon:'⚾', teams:[['BOS','Boston Red Sox'],['SF','San Francisco Giants']] },
-            { league:'NFL', sport:'football', key:'nfl', icon:'🏈', teams:[['SF','San Francisco 49ers']] },
-            { league:'NHL', sport:'hockey', key:'nhl', icon:'🏒', teams:[['SJ','San Jose Sharks']] },
-            { league:'MLS', sport:'soccer', key:'usa.1', icon:'⚽', teams:[['SJ','San Jose Earthquakes']] }
+            { league:'MLB', sport:'baseball', key:'mlb', icon:'⚾', standingsLevel:3, teams:[['BOS','Boston Red Sox'],['SF','San Francisco Giants']] },
+            { league:'NFL', sport:'football', key:'nfl', icon:'🏈', standingsLevel:3, teams:[['SF','San Francisco 49ers']] },
+            { league:'NHL', sport:'hockey', key:'nhl', icon:'🏒', standingsLevel:3, teams:[['SJ','San Jose Sharks']] },
+            { league:'MLS', sport:'soccer', key:'usa.1', icon:'⚽', standingsLevel:2, teams:[['SJ','San Jose Earthquakes']] }
           ];
 
           async function get(url) {
@@ -169,7 +169,7 @@ jobs:
             for (const conf of configs) {
               const teamsData = await get(`https://site.api.espn.com/apis/site/v2/sports/${conf.sport}/${conf.key}/teams`);
               let standings = {};
-              try { standings = await get(`https://site.api.espn.com/apis/v2/sports/${conf.sport}/${conf.key}/standings`); } catch (e) { console.log('Standings unavailable:', e.message); }
+              try { standings = await get(`https://site.api.espn.com/apis/v2/sports/${conf.sport}/${conf.key}/standings?level=${conf.standingsLevel}`); } catch (e) { console.log('Standings unavailable:', e.message); }
               const catalog = [...new Map(walkTeams(teamsData).map(t => [t.abbreviation, t])).values()];
               const teams = [];
               for (const spec of conf.teams) teams.push(await loadTeam(conf, spec, catalog, standings));
