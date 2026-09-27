@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-27T03:27:08.635Z",
+  "updatedAt": "2026-09-27T03:42:55.302Z",
   "leagues": [
     {
       "league": "MLB",
@@ -60,7 +60,7 @@
           "record": "1-1-1",
           "rank": 5,
           "points": "3",
-          "gb": "3",
+          "gb": "5",
           "streak": "W1",
           "leaders": []
         }
