@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-29T03:10:39.793Z",
+  "updatedAt": "2026-09-29T03:34:15.178Z",
   "leagues": [
     {
       "league": "MLB",
@@ -58,10 +58,6 @@
           "abbr": "SJ",
           "logo": "https://a.espncdn.com/i/teamlogos/nhl/500/sj.png",
           "record": "0-0-0",
-          "rank": 4,
-          "points": "0",
-          "gb": "-",
-          "streak": "-",
           "leaders": []
         }
       ]
