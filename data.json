@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-25T03:01:24.231Z",
+  "updatedAt": "2026-10-25T03:42:54.682Z",
   "leagues": [
     {
       "league": "MLB",
@@ -75,7 +75,7 @@
           "name": "San Jose Earthquakes",
           "abbr": "SJ",
           "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/191.png",
-          "record": "13-8-9",
+          "record": "13-9-9",
           "rank": 5,
           "points": "48",
           "leaders": []
