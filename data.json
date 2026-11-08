@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T23:48:19.268Z",
+  "updatedAt": "2026-11-08T04:31:57.443Z",
   "leagues": [
     {
       "league": "MLB",
@@ -57,11 +57,11 @@
           "name": "San Jose Sharks",
           "abbr": "SJ",
           "logo": "https://a.espncdn.com/i/teamlogos/nhl/500/sj.png",
-          "record": "7-10-1",
+          "record": "7-11-1",
           "rank": 6,
           "points": "15",
           "gb": "10",
-          "streak": "L4",
+          "streak": "L5",
           "leaders": []
         }
       ]
@@ -75,7 +75,7 @@
           "name": "San Jose Earthquakes",
           "abbr": "SJ",
           "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/191.png",
-          "record": "14-9-10",
+          "record": "14-10-10",
           "rank": 5,
           "points": "52",
           "leaders": []
