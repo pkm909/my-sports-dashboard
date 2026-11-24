@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-24T05:25:29.503Z",
+  "updatedAt": "2026-11-24T16:08:46.337Z",
   "leagues": [
     {
       "league": "MLB",
@@ -57,11 +57,11 @@
           "name": "San Jose Sharks",
           "abbr": "SJ",
           "logo": "https://a.espncdn.com/i/teamlogos/nhl/500/sj.png",
-          "record": "11-12-2",
+          "record": "11-13-2",
           "rank": 3,
           "points": "24",
           "gb": "14",
-          "streak": "W1",
+          "streak": "L1",
           "leaders": []
         }
       ]
